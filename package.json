@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server/server.js",
-    "test": "xo"
+    "test": "mocha server/**/*.test.js",
+    "test-watch": "nodemon --exec  'npm test'"
   },
   "author": "",
   "license": "ISC",
@@ -36,6 +37,12 @@
     ],
     "space": "true",
     "rules": {
+      "import/no-unresolved": [
+        "error",
+        {
+          "ignore": [ "test/" ]
+        }
+      ],
       "comma-dangle": [
         2,
         "always-multiline"
