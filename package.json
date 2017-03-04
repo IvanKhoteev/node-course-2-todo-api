@@ -16,9 +16,35 @@
     "mongoose": "^4.8.5"
   },
   "devDependencies": {
+    "expect": "^1.20.2",
+    "mocha": "^3.2.0",
+    "nodemon": "^1.11.0",
+    "supertest": "^3.0.0",
     "xo": "^0.17.1"
   },
   "xo": {
-    "space": true
+    "envs": [
+      "node",
+      "mocha",
+      "browser"
+    ],
+    "esnext": "true",
+    "globals": [
+      "expect",
+      "Modernizr",
+      "BUILD_MODE"
+    ],
+    "space": "true",
+    "rules": {
+      "comma-dangle": [
+        2,
+        "always-multiline"
+      ],
+      "camelcase": 0,
+      "no-unused-vars": 0,
+      "no-unused-expressions": 0,
+      "babel/new-cap": "off",
+      "import/no-extraneous-dependencies": 0
+    }
   }
 }

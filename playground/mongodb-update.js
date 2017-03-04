@@ -7,13 +7,13 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
   console.log('Connected to mongo DB server');
 
   db.collection('Todos').findOneAndUpdate({
-    _id: new ObjectID('58b7f822e9764d50be7b2e8c')
+    _id: new ObjectID('58b7f822e9764d50be7b2e8c'),
   }, {
     $set: {
-      text: 'rrrr'
-    }
+      text: 'rrrr',
+    },
   }, {
-    returnOriginal: false
+    returnOriginal: false,
   }).then(result => {
     console.log(result);
   });

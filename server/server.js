@@ -1,17 +1,17 @@
-let express = require('express');
-let bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser');
 
-let {mongoose} = require('./db/mongoose');
-let {Todo} = require('./models/todo');
-let {User} = require('./models/user');
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 
-let app = express();
+const app = express();
 
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
-  let todo = new Todo({
-    text: req.body.text
+  const todo = new Todo({
+    text: req.body.text,
   });
   todo.save().then(result => {
     res.send(result);
