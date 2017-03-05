@@ -1,15 +1,18 @@
 const path = require('path');
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 
 const app = require('./../server');
 const {Todo} = require('./../models/todo');
 const {User} = require('./../models/user');
 
 const todos = [{
+  _id: new ObjectID(),
   text: 'First test todo text',
 },
 {
+  _id: new ObjectID(),
   text: 'Second test todo text',
 }];
 
@@ -66,6 +69,38 @@ describe('GET /todos', () => {
       .expect(200)
       .expect(res => {
         expect(res.body.todos.length).toEqual(todos.length);
+      })
+      .end(done());
+  });
+});
+
+describe('GET /todos/:id', () => {
+  it('should return error if invalid ObjectID passed', done => {
+    request(app)
+      .get('todos/123')
+      .expect(404)
+      .expect(res => {
+        expect(res.body).toBe(null);
+      })
+      .end(done());
+  });
+
+  it('should return 404 status if document not found', done => {
+    request(app)
+      .get(`todos/${new ObjectID().toHexString()}`)
+      .expect(404)
+      .expect(res => {
+        expect(res.body).toBe(null);
+      })
+      .end(done());
+  });
+
+  it('should return document if passed valid ObjectId and document exists', done => {
+    request(app)
+      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.text).toBe(todos[0].text);
       })
       .end(done());
   });
