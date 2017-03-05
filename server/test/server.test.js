@@ -1,4 +1,3 @@
-const path = require('path');
 const expect = require('expect');
 const request = require('supertest');
 const {ObjectID} = require('mongodb');
@@ -17,9 +16,9 @@ const todos = [{
 }];
 
 beforeEach(done => {
-  Todo.remove({})
-    .then(() => Todo.insertMany(todos))
-    .then(() => done());
+  Todo.remove({}).then(() => {
+    return Todo.insertMany(todos);
+  }).then(() => done());
 });
 
 describe('POST /todos', () => {
@@ -70,38 +69,69 @@ describe('GET /todos', () => {
       .expect(res => {
         expect(res.body.todos.length).toEqual(todos.length);
       })
-      .end(done());
+      .end(done);
   });
 });
 
 describe('GET /todos/:id', () => {
   it('should return error if invalid ObjectID passed', done => {
     request(app)
-      .get('todos/123')
+      .get('/todos/123')
       .expect(404)
-      .expect(res => {
-        expect(res.body).toBe(null);
-      })
-      .end(done());
+      .end(done);
   });
 
   it('should return 404 status if document not found', done => {
+    const hexId = new ObjectID().toHexString();
     request(app)
-      .get(`todos/${new ObjectID().toHexString()}`)
+      .get(`/todos/${hexId}`)
       .expect(404)
-      .expect(res => {
-        expect(res.body).toBe(null);
-      })
-      .end(done());
+      .end(done);
   });
 
   it('should return document if passed valid ObjectId and document exists', done => {
+    const hexId = todos[0]._id.toHexString();
     request(app)
-      .get(`/todos/${todos[0]._id.toHexString()}`)
+      .get(`/todos/${hexId}`)
       .expect(200)
       .expect(res => {
         expect(res.body.todo.text).toBe(todos[0].text);
       })
-      .end(done());
+      .end(done);
+  });
+});
+
+describe('DELETE /todos/:id', () => {
+  it('should return 404 if Object id is invald', done => {
+    request(app)
+      .delete('/todos/123')
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 if document not found', done => {
+    request(app)
+      .get(`/todos/${new ObjectID().toHexString()}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return removed document id document exists', done => {
+    const hexId = todos[1]._id.toHexString();
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo._id).toBe(hexId);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+        Todo.findById(hexId).then(todo => {
+          expect(todo).toNotExist();
+          done();
+        }).catch(err => done(err));
+      });
   });
 });
