@@ -9,10 +9,20 @@ const {User} = require('./../models/user');
 const todos = [{
   _id: new ObjectID(),
   text: 'First test todo text',
+  completed: true,
+  completedAt: Date.now(),
 },
 {
   _id: new ObjectID(),
   text: 'Second test todo text',
+  completed: false,
+  completedAt: null,
+},
+{
+  _id: new ObjectID(),
+  text: 'Third test todo text',
+  completed: true,
+  completedAt: Date.now(),
 }];
 
 beforeEach(done => {
@@ -54,7 +64,7 @@ describe('POST /todos', () => {
           return done(err);
         }
         Todo.find().then(todos => {
-          expect(todos.length).toBe(2);
+          expect(todos.length).toBe(3);
           done();
         }).catch(err => done(err));
       });
@@ -111,7 +121,7 @@ describe('DELETE /todos/:id', () => {
 
   it('should return 404 if document not found', done => {
     request(app)
-      .get(`/todos/${new ObjectID().toHexString()}`)
+      .delete(`/todos/${new ObjectID().toHexString()}`)
       .expect(404)
       .end(done);
   });
@@ -133,5 +143,73 @@ describe('DELETE /todos/:id', () => {
           done();
         }).catch(err => done(err));
       });
+  });
+});
+describe('PATCH /todos/:id', () => {
+  it('should return 404 if id is invalid', done => {
+    request(app)
+      .patch('/todos/123')
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return 404 if document not found', done => {
+    request(app)
+      .patch(`/todos/${new ObjectID().toHexString()}`)
+      .expect(404)
+      .end(done);
+  });
+
+  it('should return updated object if all correct (completed: true)', done => {
+    const hexId = todos[1]._id.toHexString();
+    const newText = 'Some new test text';
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        text: newText,
+        completed: true,
+      })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.text).toBe(newText);
+        expect(res.body.todo.completed).toBe(true);
+        expect(res.body.todo.completedAt).toNotBe(null).toBeA('number');
+      })
+      .end(done);
+  });
+
+  it('should return updated object if all correct (completed: false)', done => {
+    const hexId = todos[0]._id.toHexString();
+    const newText = 'Some new test text';
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        text: newText,
+        completed: false,
+      })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.text).toBe(newText);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toBe(null);
+      })
+      .end(done);
+  });
+
+  it('should return updated object if all correct (completed not pass)', done => {
+    const hexId = todos[2]._id.toHexString();
+    const newText = 'Some new test text';
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        text: newText,
+      })
+      .expect(200)
+      .expect(res => {
+        expect(res.body.todo.text).toBe(newText);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toBe(null);
+      })
+      .end(done);
   });
 });
