@@ -8,6 +8,7 @@ const _ = require('lodash');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
+const {authenticate} = require('./middleware/authenticate');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -93,6 +94,23 @@ app.post('/users', (req, res) => {
   }).then(token => {
     res.header('x-auth', token).send(user.toJSON());
   }).catch(err => res.status(400).send(err));
+});
+
+// const authenticate = (req, res, next) => {
+//   const token = req.header('x-auth');
+//
+//   User.findByToken(token).then(user => {
+//     if (!user) {
+//       return Promise.reject();
+//     }
+//     req.user = user;
+//     req.token - token;
+//     next();
+//   }).catch(err => res.status(401).send(err));
+// };
+//
+app.get('/users/me', authenticate, (req, res) => {
+  res.send(req.user);
 });
 
 app.listen(port, () => {
