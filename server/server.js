@@ -96,19 +96,6 @@ app.post('/users', (req, res) => {
   }).catch(err => res.status(400).send(err));
 });
 
-// const authenticate = (req, res, next) => {
-//   const token = req.header('x-auth');
-//
-//   User.findByToken(token).then(user => {
-//     if (!user) {
-//       return Promise.reject();
-//     }
-//     req.user = user;
-//     req.token - token;
-//     next();
-//   }).catch(err => res.status(401).send(err));
-// };
-//
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
 });
