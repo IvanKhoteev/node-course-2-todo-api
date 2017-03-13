@@ -4,16 +4,16 @@ const bcrypt = require('bcryptjs');
 
 const password = 'password';
 
-bcrypt.genSalt(10, (err, salt) => {
-  bcrypt.hash(password, salt, (err, hash) => {
-    console.log(hash);
-    bcrypt.compare(password, '$2a$10$PqtfJxEHxwUfQ6lRgy09mOH7Q4Fj5h2hdr3UGv.G0GiwSN1LskoYC', (err, res) => {
-      console.log(res);
-    });
-  });
-});
-
-// const data = {
+// bcrypt.genSalt(10, (err, salt) => {
+//   bcrypt.hash(password, salt, (err, hash) => {
+//     console.log(hash);
+//     bcrypt.compare(password, '$2a$10$PqtfJxEHxwUfQ6lRgy09mOH7Q4Fj5h2hdr3UGv.G0GiwSN1LskoYC', (err, res) => {
+//       console.log(res);
+//     });
+//   });
+// });
+//
+// // const data = {
 //   id: 4,
 // };
 //
