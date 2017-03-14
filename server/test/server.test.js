@@ -297,7 +297,7 @@ describe('GET /users/me', () => {
 
 describe('POST /users/login', () => {
   it('should return 400 if invalid data', done => {
-    const email = users[0].email;
+    const email = users[1].email;
     const password = '12345';
 
     request(app)
@@ -306,22 +306,45 @@ describe('POST /users/login', () => {
       .expect(400)
       .expect(res => {
         expect(res.body).toEqual({});
+        expect(res.headers['x-auth']).toNotExist();
       })
-      .end(done);
+      .end((err, res) => {
+        if (err) {
+          done(err);
+        }
+
+        User.findById(users[1]._id).then(user => {
+          expect(user.tokens.length).toBe(0);
+          done();
+        }).catch(err => done(err));
+      });
   });
 
   it('should return user if data valid', done => {
-    const email = users[0].email;
-    const password = users[0].password;
+    const email = users[1].email;
+    const password = users[1].password;
 
     request(app)
       .post('/users/login')
       .send({email, password})
       .expect(200)
       .expect(res => {
-        expect(res.body.email).toBe(users[0].email);
-        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[1].email);
+        expect(res.body._id).toBe(users[1]._id.toHexString());
+        expect(res.headers['x-auth']).toExist();
       })
-      .end(done);
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findById(users[1]._id).then(user => {
+          expect(user.tokens[0]).toInclude({
+            access: 'auth',
+            token: res.headers['x-auth'],
+          });
+          done();
+        }).catch(err => done(err));
+      });
   });
 });
